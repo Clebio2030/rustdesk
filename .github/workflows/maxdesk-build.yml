@@ -162,6 +162,7 @@ jobs:
         uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce
 
       - name: Build MSI installer
+        continue-on-error: true
         run: |
           pushd ./res/msi
           python preprocess.py --arp -d ../../maxdesk
@@ -171,6 +172,7 @@ jobs:
           mv $msi.FullName ../../Output/maxdesk-${{ env.VERSION }}-x86_64.msi
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: maxdesk-windows-x64-${{ env.VERSION }}
