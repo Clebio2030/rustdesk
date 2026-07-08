@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "CS Digitalz" "\0"
             VALUE "FileDescription", "MaxDesk Remote Desktop" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "rustdesk" "\0"
+            VALUE "InternalName", "maxdesk" "\0"
             VALUE "LegalCopyright", "Copyright © 2026 CS Digitalz. All rights reserved." "\0"
-            VALUE "OriginalFilename", "rustdesk.exe" "\0"
+            VALUE "OriginalFilename", "maxdesk.exe" "\0"
             VALUE "ProductName", "MaxDesk" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
