@@ -153,7 +153,7 @@ jobs:
           sed -i '/dpiAware/d' res/manifest.xml
           pushd ./libs/portable
           pip3 install -r requirements.txt
-          python3 ./generate.py -f ../../maxdesk/ -o . -e ../../maxdesk/rustdesk.exe
+          python3 ./generate.py -f ../../maxdesk/ -o . -e ../../maxdesk/maxdesk.exe
           popd
           mkdir -p ./Output
           mv ./target/release/rustdesk-portable-packer.exe ./Output/maxdesk-${{ env.VERSION }}-x86_64.exe
