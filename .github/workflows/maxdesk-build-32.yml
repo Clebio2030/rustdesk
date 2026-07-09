@@ -55,7 +55,7 @@ jobs:
         run: |
           # Classic mode: run outside the repo so vcpkg.json manifest is ignored.
           cd /c
-          if ! C:/vcpkg/vcpkg install libvpx libyuv opus aom libjpeg-turbo --triplet x86-windows-static; then
+          if ! C:/vcpkg/vcpkg install libvpx libyuv opus aom libjpeg-turbo libsodium --triplet x86-windows-static; then
             find "C:/vcpkg/" -name "*.log" | while read -r f; do echo "=== $f ==="; cat "$f"; done
             exit 1
           fi
@@ -75,6 +75,8 @@ jobs:
         env:
           VCPKG_ROOT: C:\vcpkg
           RUSTFLAGS: "-C target-feature=+crt-static"
+          SODIUM_LIB_DIR: C:\vcpkg\installed\x86-windows-static\lib
+          SODIUM_STATIC: "1"
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
