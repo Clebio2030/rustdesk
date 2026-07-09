@@ -1,0 +1,97 @@
+name: Build MaxDesk 32-bit (Sciter)
+
+on:
+  workflow_dispatch:
+
+env:
+  RUST_VERSION: "1.75"
+  LLVM_VERSION: "15.0.6"
+  VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
+  VERSION: "1.4.9"
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  build-maxdesk-32:
+    name: MaxDesk Windows x86 (32-bit)
+    runs-on: windows-2022
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Checkout source code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@ebc0426251bc40c7cd31162802432c68818ab8f0
+        with:
+          version: ${{ env.LLVM_VERSION }}
+
+      - name: Install Rust toolchain (i686)
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: i686-pc-windows-msvc
+          components: "rustfmt"
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        with:
+          prefix-key: windows-2022-x86
+
+      - name: Setup vcpkg with GitHub Actions binary cache
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2
+        with:
+          vcpkgDirectory: C:\vcpkg
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotCache: false
+
+      - name: Install vcpkg dependencies (x86-windows-static)
+        shell: bash
+        run: |
+          # Classic mode: run outside the repo so vcpkg.json manifest is ignored.
+          cd /c
+          if ! C:/vcpkg/vcpkg install libvpx libyuv opus aom libjpeg-turbo --triplet x86-windows-static; then
+            find "C:/vcpkg/" -name "*.log" | while read -r f; do echo "=== $f ==="; cat "$f"; done
+            exit 1
+          fi
+
+      - name: Download 32-bit sciter.dll
+        shell: bash
+        run: |
+          curl -fL -o sciter.dll https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x32/sciter.dll
+          ls -la sciter.dll
+
+      - name: Inline Sciter resources
+        shell: bash
+        run: python3 res/inline-sciter.py
+
+      - name: Build MaxDesk (Sciter, 32-bit)
+        shell: bash
+        env:
+          VCPKG_ROOT: C:\vcpkg
+          RUSTFLAGS: "-C target-feature=+crt-static"
+        run: |
+          cargo build --locked --release --features inline --target i686-pc-windows-msvc
+          ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
+
+      - name: Assemble package
+        shell: bash
+        run: |
+          mkdir -p Output
+          cp target/i686-pc-windows-msvc/release/rustdesk.exe Output/maxdesk.exe
+          cp sciter.dll Output/sciter.dll
+          ls -la Output/
+
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: maxdesk-32bit-${{ env.VERSION }}
+          path: |
+            ./Output/maxdesk.exe
+            ./Output/sciter.dll
