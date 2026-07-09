@@ -76,7 +76,6 @@ jobs:
           VCPKG_ROOT: C:\vcpkg
           RUSTFLAGS: "-C target-feature=+crt-static"
           SODIUM_LIB_DIR: C:\vcpkg\installed\x86-windows-static\lib
-          SODIUM_STATIC: "1"
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
