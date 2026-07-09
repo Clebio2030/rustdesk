@@ -75,7 +75,8 @@ jobs:
         env:
           VCPKG_ROOT: C:\vcpkg
           RUSTFLAGS: "-C target-feature=+crt-static"
-          SODIUM_LIB_DIR: C:\vcpkg\installed\x86-windows-static\lib
+          # Sem SODIUM_LIB_DIR: libsodium-sys compila o libsodium do fonte (igual ao
+          # build 64-bit, que funciona). A lib do vcpkg x86 dava LNK2019 (simbolos).
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
