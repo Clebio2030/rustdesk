@@ -75,10 +75,10 @@ jobs:
         env:
           VCPKG_ROOT: C:\vcpkg
           RUSTFLAGS: "-C target-feature=+crt-static"
-          # libsodium estatica do vcpkg. SODIUM_STATIC=1 e obrigatorio: sem ele o link
-          # espera a lib como DLL (dllimport) e da LNK2019 nos 132 simbolos _crypto_*.
+          # libsodium estatica do vcpkg. libsodium-sys 0.2.7 linka estatico por padrao
+          # quando SODIUM_SHARED NAO esta setado; SODIUM_STATIC foi removido (a crate
+          # da panic: "deprecated, use SODIUM_SHARED instead").
           SODIUM_LIB_DIR: C:\vcpkg\installed\x86-windows-static\lib
-          SODIUM_STATIC: "1"
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
