@@ -80,11 +80,14 @@ jobs:
         shell: bash
         env:
           VCPKG_ROOT: C:\vcpkg
-          RUSTFLAGS: "-C target-feature=+crt-static"
-          # SEM SODIUM_LIB_DIR: essa var e global e aponta so uma arquitetura, quebrando
-          # o outro alvo (host x64 vs alvo x86). libsodium-sys usa a crate `vcpkg` e
-          # escolhe o triplet certo por-target (x64-windows-static p/ host, x86 p/ alvo),
-          # ambos instalados no step anterior. crt-static faz a crate pegar o triplet -static.
+          # rustflags SO para o alvo i686 (nao afeta o build-script do host x64, que acha
+          # a libsodium x64 sozinho via a crate `vcpkg`). A crate `vcpkg` do libsodium-sys
+          # 0.2.7 resolve x64 mas NAO x86, deixando 132 simbolos _crypto_* sem resolver
+          # (LNK2019) no alvo. Aqui linkamos a libsodium x86 explicitamente. Precisamos
+          # NAO usar RUSTFLAGS global (ela sobrescreveria isto e vazaria pro host); e
+          # replicar crt-static + /NODEFAULTLIB:MSVCRT porque CARGO_TARGET_*_RUSTFLAGS
+          # substitui (nao mescla) o .cargo/config.toml.
+          CARGO_TARGET_I686_PC_WINDOWS_MSVC_RUSTFLAGS: "-Ctarget-feature=+crt-static -Clink-args=/NODEFAULTLIB:MSVCRT -Lnative=C:/vcpkg/installed/x86-windows-static/lib -lstatic=libsodium"
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
