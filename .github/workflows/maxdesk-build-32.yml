@@ -59,6 +59,12 @@ jobs:
             find "C:/vcpkg/" -name "*.log" | while read -r f; do echo "=== $f ==="; cat "$f"; done
             exit 1
           fi
+          # libsodium x64 tambem: o build-script do rustdesk (build.rs) e compilado para
+          # o HOST (x64) e linka sodiumoxide. Sem a lib x64 da LNK2019 (simbolos sem "_").
+          if ! C:/vcpkg/vcpkg install libsodium --triplet x64-windows-static; then
+            find "C:/vcpkg/" -name "*.log" | while read -r f; do echo "=== $f ==="; cat "$f"; done
+            exit 1
+          fi
 
       - name: Download 32-bit sciter.dll
         shell: bash
@@ -75,10 +81,10 @@ jobs:
         env:
           VCPKG_ROOT: C:\vcpkg
           RUSTFLAGS: "-C target-feature=+crt-static"
-          # libsodium estatica do vcpkg. libsodium-sys 0.2.7 linka estatico por padrao
-          # quando SODIUM_SHARED NAO esta setado; SODIUM_STATIC foi removido (a crate
-          # da panic: "deprecated, use SODIUM_SHARED instead").
-          SODIUM_LIB_DIR: C:\vcpkg\installed\x86-windows-static\lib
+          # SEM SODIUM_LIB_DIR: essa var e global e aponta so uma arquitetura, quebrando
+          # o outro alvo (host x64 vs alvo x86). libsodium-sys usa a crate `vcpkg` e
+          # escolhe o triplet certo por-target (x64-windows-static p/ host, x86 p/ alvo),
+          # ambos instalados no step anterior. crt-static faz a crate pegar o triplet -static.
         run: |
           cargo build --locked --release --features inline --target i686-pc-windows-msvc
           ls -la target/i686-pc-windows-msvc/release/rustdesk.exe
