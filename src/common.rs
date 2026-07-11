@@ -2081,15 +2081,15 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
 }
 
 pub fn load_custom_client() {
-    // MaxDesk: embute o Servidor da API por padrao, para o campo vir preenchido
-    // e ser usado sem o usuario precisar digitar. Usa or_insert para nao
-    // sobrescrever caso um custom.txt defina outro valor.
+    // MaxDesk: embute servidor por padrao. or_insert preserva custom.txt se definido.
     {
-        config::DEFAULT_SETTINGS
-            .write()
-            .unwrap()
-            .entry(keys::OPTION_API_SERVER.to_string())
+        let mut s = config::DEFAULT_SETTINGS.write().unwrap();
+        s.entry(keys::OPTION_API_SERVER.to_string())
             .or_insert_with(|| "https://maxdesk.csdigitalz.com.br".to_string());
+        // define custom-rendezvous-server para que using_public_server() retorne false
+        // e o aviso "configure seu proprio servidor" nao apareça no cliente MaxDesk
+        s.entry("custom-rendezvous-server".to_string())
+            .or_insert_with(|| "maxdesk.csdigitalz.com.br".to_string());
     }
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
