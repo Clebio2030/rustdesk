@@ -10,7 +10,11 @@ env:
   NDK_VERSION: "r27c"
   CARGO_NDK_VERSION: "3.5.4"
   VERSION: "1.4.9"
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  # cache binario do vcpkg DESLIGADO de proposito: ao restaurar do cache x-gha, os
+  # headers (vpx/vp8.h, opus/opus_multistream.h) nao ficam materializados no install
+  # tree /opt/vcpkg/installed/<triplet>/include e scrap/magnum-opus falham. Build fresca
+  # (~15min de deps) instala tudo corretamente, como no run #1.
+  VCPKG_BINARY_SOURCES: "clear"
 
 jobs:
   # Gera os arquivos de bridge Flutter/Rust (mesma fonte do build Windows)
