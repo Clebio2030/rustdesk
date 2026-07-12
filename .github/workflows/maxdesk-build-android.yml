@@ -96,6 +96,14 @@ jobs:
         run: |
           bash flutter/build_android_deps.sh arm64-v8a
           bash flutter/build_android_deps.sh armeabi-v7a
+          echo "===== DIAG: onde estao os headers android ====="
+          ls -la /opt/vcpkg/installed/ 2>&1 || true
+          for t in arm64-android arm-android arm-neon-android; do
+            echo "--- $t include/vpx include/opus ---"
+            ls /opt/vcpkg/installed/$t/include/vpx/vp8.h /opt/vcpkg/installed/$t/include/opus/opus_multistream.h 2>&1 || true
+          done
+          echo "--- find vp8.h em todo o vcpkg ---"
+          find /opt/vcpkg -name vp8.h 2>/dev/null | head
 
       - name: Build MaxDesk Rust lib (arm64 + arm) into jniLibs
         shell: bash
