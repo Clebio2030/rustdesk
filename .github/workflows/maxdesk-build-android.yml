@@ -141,7 +141,8 @@ jobs:
         shell: bash
         run: |
           cd flutter/android
-          keytool -genkey -v -keystore maxdesk.jks -keyalg RSA -keysize 2048 -validity 10000 \
+          # keystore vai em app/ porque o storeFile do build.gradle e relativo ao modulo app
+          keytool -genkey -v -keystore app/maxdesk.jks -keyalg RSA -keysize 2048 -validity 10000 \
             -alias maxdesk -storepass maxdesk123 -keypass maxdesk123 \
             -dname "CN=MaxDesk, OU=CSDigitalz, O=CSDigitalz, L=BR, S=BR, C=BR"
           cat > key.properties <<EOF
