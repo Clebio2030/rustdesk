@@ -95,15 +95,15 @@ jobs:
           ANDROID_NDK: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
           bash flutter/build_android_deps.sh arm64-v8a
+          # o proximo install (vcpkg manifest mode) remove triplets fora do plano atual
+          # (mantem so o host x64-linux + o corrente), apagando o arm64-android. Preserva
+          # e restaura, senao a lib arm64 nao acha vpx/opus (vp8.h/opus_multistream.h).
+          cp -a /opt/vcpkg/installed/arm64-android /tmp/keep-arm64-android
           bash flutter/build_android_deps.sh armeabi-v7a
-          echo "===== DIAG: onde estao os headers android ====="
-          ls -la /opt/vcpkg/installed/ 2>&1 || true
-          for t in arm64-android arm-android arm-neon-android; do
-            echo "--- $t include/vpx include/opus ---"
-            ls /opt/vcpkg/installed/$t/include/vpx/vp8.h /opt/vcpkg/installed/$t/include/opus/opus_multistream.h 2>&1 || true
-          done
-          echo "--- find vp8.h em todo o vcpkg ---"
-          find /opt/vcpkg -name vp8.h 2>/dev/null | head
+          rm -rf /opt/vcpkg/installed/arm64-android
+          cp -a /tmp/keep-arm64-android /opt/vcpkg/installed/arm64-android
+          echo "=== verify (as duas ABIs devem existir) ==="
+          ls /opt/vcpkg/installed/arm64-android/include/vpx/vp8.h /opt/vcpkg/installed/arm-android/include/vpx/vp8.h
 
       - name: Build MaxDesk Rust lib (arm64 + arm) into jniLibs
         shell: bash
