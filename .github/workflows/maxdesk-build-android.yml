@@ -99,10 +99,15 @@ jobs:
           VCPKG_ROOT: /opt/vcpkg
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           ANDROID_NDK: ${{ steps.setup-ndk.outputs.ndk-path }}
+          # varias crates -sys (magnum-opus, kcp-sys, ...) rodam bindgen e por padrao o
+          # libclang usa os headers do host (/usr/include) -> 'bits/libc-header-start.h
+          # not found' e nao acha os headers do vcpkg (opus/opus_multistream.h). Apontamos
+          # bindgen pro sysroot do NDK + include do vcpkg por-target.
+          NDK_SYSROOT: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+          BINDGEN_EXTRA_CLANG_ARGS_aarch64-linux-android: "--sysroot=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/sysroot -I/opt/vcpkg/installed/arm64-android/include"
+          BINDGEN_EXTRA_CLANG_ARGS_armv7-linux-androideabi: "--sysroot=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/sysroot -I/opt/vcpkg/installed/arm-android/include"
         run: |
-          # sem hwcodec: o build.rs da crate hwcodec roda bindgen apontando pros headers
-          # do host (/usr/include) em vez do sysroot do NDK -> 'bits/libc-header-start.h
-          # not found'. Android roda com codec por software; hwcodec fica pra depois.
+          # sem hwcodec: o build.rs da crate hwcodec tambem roda bindgen; fica pra depois.
           cargo ndk --platform 21 --target aarch64-linux-android -o ./flutter/android/app/src/main/jniLibs \
             build --locked --release --features flutter
           cargo ndk --platform 21 --target armv7-linux-androideabi -o ./flutter/android/app/src/main/jniLibs \
