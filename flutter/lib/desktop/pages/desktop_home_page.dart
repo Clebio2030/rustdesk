@@ -431,19 +431,15 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 
   Widget buildHelpCards(String updateUrl) {
     // MaxDesk: mostra o aviso de nova versao tambem em cliente custom.
-    // Botao abre a pagina de release (updateUrl) no navegador — simples e robusto,
-    // sem a maquina de auto-download/instalacao que depende do naming do RustDesk.
+    // Botao "Update" BAIXA E INSTALA sozinho (handleUpdate) com barra de progresso,
+    // usando a maquina nativa do RustDesk (update_to trata cliente custom + --update).
     if (updateUrl.isNotEmpty && !isCardClosed) {
-      GestureTapCallback onPressed = () async {
-        await launchUrl(Uri.parse(updateUrl));
-      };
       return buildInstallCard(
           "Status",
           "${translate("new-version-of-{${bind.mainGetAppNameSync()}}-tip")} (${bind.mainGetNewVersion()}).",
           'Update',
-          onPressed,
-          closeButton: true,
-          link: updateUrl);
+          () => handleUpdate(updateUrl),
+          closeButton: true);
     }
     if (systemError.isNotEmpty) {
       return buildInstallCard("", systemError, "", () {});
