@@ -939,9 +939,9 @@ pub fn is_modifier(evt: &KeyEvent) -> bool {
 }
 
 pub fn check_software_update() {
-    if is_custom_client() {
-        return;
-    }
+    // MaxDesk: cliente custom TAMBEM verifica update, mas contra o NOSSO servidor
+    // (ver version_check_request em hbb_common/lib.rs). O early-return original
+    // impedia qualquer verificacao em custom client.
     let opt = LocalConfig::get_option(keys::OPTION_ENABLE_CHECK_UPDATE);
     if config::option2bool(keys::OPTION_ENABLE_CHECK_UPDATE, &opt) {
         std::thread::spawn(move || allow_err!(do_check_software_update()));
