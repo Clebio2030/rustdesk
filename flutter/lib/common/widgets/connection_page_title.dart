@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import '../../common.dart';
 
 Widget getConnectionPageTitle(BuildContext context, bool isWeb) {
+  // MaxDesk: a ajuda do "?" agora aparece tambem no CLIQUE (antes so no hover).
+  final tooltipKey = GlobalKey<TooltipState>();
   return Row(
     children: [
       Expanded(
@@ -19,16 +21,20 @@ Widget getConnectionPageTitle(BuildContext context, bool isWeb) {
                 ?.merge(TextStyle(height: 1)),
           ).marginOnly(right: 4),
           Tooltip(
+            key: tooltipKey,
             waitDuration: Duration(milliseconds: 300),
             message: translate(isWeb ? "web_id_input_tip" : "id_input_tip"),
-            child: Icon(
-              Icons.help_outline_outlined,
-              size: 16,
-              color: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.color
-                  ?.withOpacity(0.5),
+            child: InkWell(
+              onTap: () => tooltipKey.currentState?.ensureTooltipVisible(),
+              child: Icon(
+                Icons.help_outline_outlined,
+                size: 16,
+                color: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.color
+                    ?.withOpacity(0.5),
+              ),
             ),
           ),
         ],
