@@ -80,9 +80,13 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
 
     setupServerWidget() => Flexible(
           child: Offstage(
+            // MaxDesk: nunca mostrar "configure seu proprio servidor" em cliente
+            // custom (ja temos servidor embutido). isCustomClient() e confiavel
+            // pois nao depende do plumbing de config options (OPTIONS/DEFAULT_SETTINGS).
             offstage: !(!_svcStopped.value &&
                 stateGlobal.svcStatus.value == SvcStatus.ready &&
-                _svcIsUsingPublicServer.value),
+                _svcIsUsingPublicServer.value &&
+                !bind.isCustomClient()),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
