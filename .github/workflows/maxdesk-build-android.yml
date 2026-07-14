@@ -124,6 +124,13 @@ jobs:
             build --locked --release --features flutter
           cargo ndk --platform 21 --target armv7-linux-androideabi -o ./flutter/android/app/src/main/jniLibs \
             build --locked --release --features flutter
+          # o [lib] name do Cargo e "librustdesk" -> no Unix a cdylib vira "liblibrustdesk.so"
+          # (lib duplicado). O app faz System.loadLibrary("rustdesk") = procura librustdesk.so,
+          # entao renomeamos. Sem isso: UnsatisfiedLinkError e crash no onCreate.
+          for abi in arm64-v8a armeabi-v7a; do
+            d=./flutter/android/app/src/main/jniLibs/$abi
+            [ -f "$d/liblibrustdesk.so" ] && mv -f "$d/liblibrustdesk.so" "$d/librustdesk.so"
+          done
           # strip via llvm-strip do NDK (reduz o tamanho da .so)
           TC="${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin"
           "$TC/llvm-strip" ./flutter/android/app/src/main/jniLibs/arm64-v8a/*.so || true
