@@ -293,5 +293,7 @@ fn update_new_version(update_msi: bool, version: &str, file_path: &PathBuf) {
 
 pub fn get_download_file_from_url(url: &str) -> Option<PathBuf> {
     let filename = url.split('/').last()?;
-    Some(std::env::temp_dir().join(filename))
+    let dir = std::env::temp_dir().join("rustdesk_update");
+    std::fs::create_dir_all(&dir).ok()?;
+    Some(dir.join(filename))
 }
