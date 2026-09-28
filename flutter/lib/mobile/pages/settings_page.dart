@@ -987,6 +987,30 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
               onPressed: (context) =>
                   launchUrlString('https://maxdesk.csdigitalz.com.br'),
               leading: Icon(Icons.privacy_tip),
+            ),
+            SettingsTile(
+              title: Text("Download Windows"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/exe'),
+              leading: Icon(Icons.desktop_windows),
+            ),
+            SettingsTile(
+              title: Text("Download Linux"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/linux'),
+              leading: Icon(Icons.computer),
+            ),
+            SettingsTile(
+              title: Text("Download Android"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/apk'),
+              leading: Icon(Icons.android),
+            ),
+            SettingsTile(
+              title: Text("Acesso Web"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/web/'),
+              leading: Icon(Icons.web),
             )
           ],
         ),

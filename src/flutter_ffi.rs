@@ -2886,7 +2886,17 @@ pub fn main_get_common(key: String) -> String {
                     "error:unsupported".to_owned()
                 };
             }
-            #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+            #[cfg(target_os = "linux")]
+            {
+                return if cfg!(target_arch = "x86_64") {
+                    format!("maxdesk-{_version}-x86_64.deb")
+                } else if cfg!(target_arch = "aarch64") {
+                    format!("maxdesk-{_version}-aarch64.deb")
+                } else {
+                    "error:unsupported".to_owned()
+                };
+            }
+            #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
             {
                 "error:unsupported".to_owned()
             }
@@ -2933,7 +2943,7 @@ pub fn main_set_common(_key: String, _value: String) {
             );
         });
     }
-    #[cfg(any(target_os = "windows", target_os = "macos"))]
+    #[cfg(any(target_os = "windows", target_os = "macos", target_os = "linux"))]
     {
         use crate::updater::get_download_file_from_url;
         if _key == "download-new-version" {
@@ -2977,6 +2987,32 @@ pub fn main_set_common(_key: String, _value: String) {
                         Err(e) => {
                             log::error!("Failed to update to new version, {}", e);
                             fs::remove_file(f).ok();
+                        }
+                    }
+
+                    #[cfg(target_os = "linux")]
+                    {
+                        // Install .deb via pkexec for privilege escalation
+                        match std::process::Command::new("pkexec")
+                            .args(["dpkg", "-i", f])
+                            .status()
+                        {
+                            Ok(status) if status.success() => {
+                                log::info!("Linux update installed successfully, restarting service");
+                                // Restart the systemd service so the new version takes effect
+                                std::process::Command::new("pkexec")
+                                    .args(["systemctl", "restart", "rustdesk"])
+                                    .status()
+                                    .ok();
+                            }
+                            Ok(status) => {
+                                log::error!("dpkg -i exited with status: {}", status);
+                                fs::remove_file(f).ok();
+                            }
+                            Err(e) => {
+                                log::error!("Failed to run pkexec dpkg -i: {}", e);
+                                fs::remove_file(f).ok();
+                            }
                         }
                     }
                 }

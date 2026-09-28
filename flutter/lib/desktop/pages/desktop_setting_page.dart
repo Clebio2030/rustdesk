@@ -2462,6 +2462,38 @@ class _AboutState extends State<_About> {
                     translate('Website'),
                     style: linkStyle,
                   ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/exe');
+                  },
+                  child: Text(
+                    'Download Windows',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/linux');
+                  },
+                  child: Text(
+                    'Download Linux',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/apk');
+                  },
+                  child: Text(
+                    'Download Android',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/web/');
+                  },
+                  child: Text(
+                    'Acesso Web',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
               Container(
                 decoration: const BoxDecoration(color: Color(0xFF2c8cff)),
                 padding:
