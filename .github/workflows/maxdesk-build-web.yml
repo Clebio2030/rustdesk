@@ -1,0 +1,137 @@
+name: Build MaxDesk Web Client
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag/versão do release (ex: v1.4.9)"
+        required: false
+        default: "nightly"
+
+env:
+  RUST_VERSION: "1.75"
+  FLUTTER_VERSION: "3.24.5"
+  LLVM_VERSION: "15.0.6"
+  VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
+  VERSION: "1.5.2"
+  TAG_NAME: ${{ github.event.inputs.tag || 'nightly' }}
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  # Gera os arquivos de bridge Flutter/Rust
+  generate-bridge:
+    uses: ./.github/workflows/bridge.yml
+
+  # Build: MaxDesk Web Client
+  build-maxdesk-web:
+    name: MaxDesk Web Client
+    needs: [generate-bridge]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Checkout source code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+
+      - name: Restore bridge files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bridge-artifact
+          path: ./
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            clang cmake curl gcc g++ git libclang-dev llvm-dev \
+            nasm ninja-build pkg-config wget yasm unzip zip \
+            libgtk-3-dev
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Patch flutter
+        shell: bash
+        run: |
+          cp .github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff $(dirname $(dirname $(which flutter)))
+          cd $(dirname $(dirname $(which flutter)))
+          [[ "3.24.5" == ${{ env.FLUTTER_VERSION }} ]] && git apply flutter_3.24.4_dropdown_menu_enableFilter.diff
+
+      - name: Build MaxDesk Web
+        run: |
+          pushd flutter
+          flutter pub get
+          flutter build web --release \
+            --web-renderer canvaskit \
+            --base-href "/web/"
+          popd
+
+      - name: Package web build
+        run: |
+          mkdir -p Output
+          cd flutter/build
+          tar -czf ../../Output/maxdesk-${{ env.VERSION }}-web.tar.gz web/
+          cd ../..
+          # Criar zip também para facilitar deploy em servidores Windows
+          cd flutter/build
+          zip -r ../../Output/maxdesk-${{ env.VERSION }}-web.zip web/
+          cd ../..
+          ls -la Output/
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: maxdesk-web-${{ env.VERSION }}
+          path: |
+            ./Output/maxdesk-*-web.tar.gz
+            ./Output/maxdesk-*-web.zip
+
+      - name: Publish Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+        with:
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: "MaxDesk ${{ github.ref_name }}"
+          body: |
+            ## MaxDesk ${{ github.ref_name }} — Web Client
+
+            Cliente web para acesso remoto via navegador.
+
+            - `maxdesk-${{ env.VERSION }}-web.tar.gz` — build web (tar.gz)
+            - `maxdesk-${{ env.VERSION }}-web.zip` — build web (zip)
+
+            Servidor: maxdesk.csdigitalz.com.br
+            Acesso web: https://maxdesk.csdigitalz.com.br/web/
+          files: |
+            ./Output/maxdesk-*-web.tar.gz
+            ./Output/maxdesk-*-web.zip
+
+      - name: Publish to Release (web-latest)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: web-latest
+          name: MaxDesk Web Client (latest)
+          files: |
+            ./Output/maxdesk-*-web.tar.gz
+            ./Output/maxdesk-*-web.zip

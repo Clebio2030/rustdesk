@@ -1,0 +1,192 @@
+name: Build MaxDesk Linux x64
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag/versão do release (ex: v1.4.9)"
+        required: false
+        default: "nightly"
+
+env:
+  RUST_VERSION: "1.75"
+  FLUTTER_VERSION: "3.24.5"
+  LLVM_VERSION: "15.0.6"
+  VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
+  VERSION: "1.5.2"
+  TAG_NAME: ${{ github.event.inputs.tag || 'nightly' }}
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+jobs:
+  # Gera os arquivos de bridge Flutter/Rust
+  generate-bridge:
+    uses: ./.github/workflows/bridge.yml
+
+  # Build principal: MaxDesk Linux x64
+  build-maxdesk-linux:
+    name: MaxDesk Linux x64
+    needs: [generate-bridge]
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo apt-get clean
+
+      - name: Checkout source code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          submodules: recursive
+
+      - name: Restore bridge files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: bridge-artifact
+          path: ./
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y \
+            clang cmake curl gcc g++ git libclang-dev llvm-dev \
+            nasm ninja-build pkg-config wget yasm unzip zip \
+            libgtk-3-dev libxcb-randr0-dev libxdo-dev libxfixes-dev \
+            libxcb-shape0-dev libxcb-xfixes0-dev libasound2-dev \
+            libpulse-dev libpam0g-dev \
+            libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            dpkg-dev rpm
+
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@ebc0426251bc40c7cd31162802432c68818ab8f0
+        with:
+          version: ${{ env.LLVM_VERSION }}
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@2783a3f08e1baf891508463f8c6653c258246225
+        with:
+          channel: "stable"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Patch flutter
+        shell: bash
+        run: |
+          cp .github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff $(dirname $(dirname $(which flutter)))
+          cd $(dirname $(dirname $(which flutter)))
+          [[ "3.24.5" == ${{ env.FLUTTER_VERSION }} ]] && git apply flutter_3.24.4_dropdown_menu_enableFilter.diff
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: x86_64-unknown-linux-gnu
+          components: "rustfmt"
+
+      - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+        with:
+          prefix-key: ubuntu-22.04
+
+      - name: Setup vcpkg with GitHub Actions binary cache
+        uses: lukka/run-vcpkg@b1a0dd252f06b9e25b3c022a9a03bd7a427fb6a2
+        with:
+          vcpkgDirectory: /opt/vcpkg
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotCache: false
+
+      - name: Install vcpkg dependencies
+        env:
+          VCPKG_ROOT: /opt/vcpkg
+        run: |
+          if ! $VCPKG_ROOT/vcpkg \
+            install \
+            --x-install-root="$VCPKG_ROOT/installed"; then
+            find "${VCPKG_ROOT}/" -name "*.log" | while read -r _1; do
+              echo "$_1:"; cat "$_1"
+            done
+            exit 1
+          fi
+        shell: bash
+
+      - name: Build MaxDesk (Rust lib)
+        env:
+          VCPKG_ROOT: /opt/vcpkg
+        run: |
+          cargo build --locked --features flutter --lib --release
+
+      - name: Refactor FFI bindings
+        run: |
+          sed -i "s/ffi.NativeFunction<ffi.Bool Function(DartPort/ffi.NativeFunction<ffi.Uint8 Function(DartPort/g" flutter/lib/generated_bridge.dart
+
+      - name: Build MaxDesk (Flutter Linux)
+        run: |
+          pushd flutter
+          flutter pub get
+          flutter build linux --release
+          popd
+
+      - name: Build .deb package
+        run: |
+          python3 ./build.py --flutter --skip-cargo
+        env:
+          VCPKG_ROOT: /opt/vcpkg
+
+      - name: Create tarball
+        run: |
+          mkdir -p Output
+          # Copiar o .deb
+          cp rustdesk-*.deb Output/maxdesk-${{ env.VERSION }}-x86_64.deb 2>/dev/null || true
+          # Criar tarball do bundle
+          tar -czf Output/maxdesk-${{ env.VERSION }}-x86_64.tar.gz \
+            -C flutter/build/linux/x64/release/bundle .
+          ls -la Output/
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: maxdesk-linux-x64-${{ env.VERSION }}
+          path: |
+            ./Output/maxdesk-*.deb
+            ./Output/maxdesk-*.tar.gz
+
+      - name: Publish Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+        with:
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: "MaxDesk ${{ github.ref_name }}"
+          body: |
+            ## MaxDesk ${{ github.ref_name }} — Linux x64
+
+            - `maxdesk-${{ env.VERSION }}-x86_64.deb` — pacote Debian/Ubuntu
+            - `maxdesk-${{ env.VERSION }}-x86_64.tar.gz` — tarball portátil
+
+            Servidor: maxdesk.csdigitalz.com.br
+          files: |
+            ./Output/maxdesk-*.deb
+            ./Output/maxdesk-*.tar.gz
+
+      - name: Publish to Release (linux-latest)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: linux-latest
+          name: MaxDesk Linux x64 (latest)
+          files: |
+            ./Output/maxdesk-*.deb
+            ./Output/maxdesk-*.tar.gz
