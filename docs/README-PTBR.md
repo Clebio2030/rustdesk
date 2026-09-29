@@ -12,6 +12,53 @@
 > **Aviso de Isenção de Responsabilidade por Uso Indevido:** <br>
 > Os desenvolvedores do RustDesk não toleram ou apoiam qualquer uso antiético ou ilegal deste software. O uso indevido, como acesso não autorizado, controle ou invasão de privacidade, viola estritamente nossas diretrizes. Os autores não são responsáveis por qualquer uso indevido do aplicativo.
 
+# MaxDesk - Solução de Acesso Remoto (CS Digitalz)
+
+> **MaxDesk** é uma solução customizada de desktop remoto de alto desempenho baseada no RustDesk, personalizada para a **CS Digitalz** (`com.csdigitalz.maxdesk`).
+
+## 🚀 Sistemas e Plataformas Disponíveis
+
+| Plataforma | Formato / Tipo | Status | Link de Download / Acesso |
+|---|---|---|---|
+| **Windows (x64)** | Executável portátil / Instalador (`.exe`) | 🟢 **Disponível** | [Baixar Windows (.exe)](https://maxdesk.csdigitalz.com.br/exe) • [Link alternativo (/app)](https://maxdesk.csdigitalz.com.br/app) |
+| **Android** | Pacote de aplicativo (`.apk`) | 🟢 **Disponível** | [Baixar Android (.apk)](https://maxdesk.csdigitalz.com.br/apk) |
+| **Web Client** | Navegador (Flutter Web / WSS) | 🟢 **Disponível** | [Acessar Web Client](https://maxdesk.csdigitalz.com.br/web/) |
+| **Linux (x64)** | Pacote Debian / Ubuntu (`.deb`) | 🟢 **Disponível / CI Ativo** | [Baixar Linux (.deb)](https://maxdesk.csdigitalz.com.br/linux) • [Link alternativo (/deb)](https://maxdesk.csdigitalz.com.br/deb) |
+
+---
+
+## ⏳ Sistemas que Faltam (Roadmap)
+
+| Plataforma | Formato Alvo | Status | Requisitos / Pendência |
+|---|---|---|---|
+| **macOS** | `.dmg` / `.pkg` (Intel e Apple Silicon) | 🔴 **Pendente** | Requer runner macOS no GitHub Actions e certificado de assinatura Apple Developer |
+| **iOS / iPadOS** | `.ipa` / TestFlight / App Store | 🔴 **Pendente** | Requer conta Apple Developer paga e ambiente macOS/Xcode |
+| **Linux ARM64** | `.deb` (Raspberry Pi / Servidores ARM) | 🟡 **Planejado** | Compilação cruzada para arquitetura `aarch64` |
+| **Windows 32-bit (x86)** | `.exe` (x86 legado) | ⚪ **Descontinuado** | Não suportado na arquitetura Flutter Desktop moderna (apenas x64) |
+
+---
+
+## 🛠️ Sub-sistemas e Funcionalidades do MaxDesk
+
+| Sub-sistema / Recurso | Status | Descrição |
+|---|---|---|
+| **Controle de Desktop Remoto** | ✅ Ativo | Visualização e controle com baixa latência e QoS adaptativo (VP9/VP8/H264/AV1) |
+| **Áudio Remoto** | ✅ Ativo | Transmissão de áudio bidirecional em tempo real com codec Opus |
+| **Controle de Entrada** | ✅ Ativo | Teclado, mouse, atalhos remotos e elevação de privilégios (UAC) |
+| **Transferência de Arquivos** | ✅ Ativo | Gerenciador de arquivos bidirecional com suporte a múltiplos arquivos |
+| **Área de Transferência (Clipboard)**| ✅ Ativo | Sincronização de texto e arquivos entre dispositivos |
+| **Port Forwarding (Túnel TCP)** | ✅ Ativo | Encaminhamento de portas TCP locais e remotas |
+| **Terminal Remoto (PTY)** | ✅ Ativo | Shell e linha de comando remota integrada |
+| **Visualização de Câmera** | ✅ Ativo | Acesso e visualização da câmera/webcam remota |
+| **Whiteboard (Lousa Virtual)** | ✅ Ativo | Desenhos e anotações em tempo real sobre a tela remota |
+| **Impressora Remota** | ✅ Ativo | Impressão de documentos remotos na impressora física local |
+| **Chat Integrado** | ✅ Ativo | Comunicação por texto entre o suporte e o cliente |
+| **Catálogo de Endereços** | ✅ Ativo | Gestão de peers favoritos, tags e grupos de computadores |
+| **Segurança & 2FA** | ✅ Ativo | Autenticação em dois fatores (TOTP) e Modo de Privacidade (tela preta) |
+| **Atualização Automática** | ✅ Ativo | Verificação e download de novas versões integrado no client |
+| **Descoberta LAN e Wake-on-LAN**| ✅ Ativo | Descoberta automática de hosts na mesma sub-rede e inicialização via WoL |
+
+---
 
 Converse conosco: [Discord](https://discord.gg/nDceKgxnkV) | [Twitter](https://twitter.com/rustdesk) | [Reddit](https://www.reddit.com/r/rustdesk) | [YouTube](https://www.youtube.com/@rustdesk)
 
