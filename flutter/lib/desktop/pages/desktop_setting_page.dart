@@ -2467,7 +2467,15 @@ class _AboutState extends State<_About> {
                     launchUrlString('https://maxdesk.csdigitalz.com.br/exe');
                   },
                   child: Text(
-                    'Download Windows',
+                    'Download Windows (64-bit)',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/exe32');
+                  },
+                  child: Text(
+                    'Download Windows (32-bit)',
                     style: linkStyle,
                   ).marginSymmetric(vertical: 4.0)),
               InkWell(

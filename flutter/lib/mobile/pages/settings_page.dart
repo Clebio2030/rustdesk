@@ -989,9 +989,15 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
               leading: Icon(Icons.privacy_tip),
             ),
             SettingsTile(
-              title: Text("Download Windows"),
+              title: Text("Download Windows (64-bit)"),
               onPressed: (context) =>
                   launchUrlString('https://maxdesk.csdigitalz.com.br/exe'),
+              leading: Icon(Icons.desktop_windows),
+            ),
+            SettingsTile(
+              title: Text("Download Windows (32-bit)"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/exe32'),
               leading: Icon(Icons.desktop_windows),
             ),
             SettingsTile(

@@ -1,13 +1,23 @@
 name: Build MaxDesk 32-bit (Sciter)
 
 on:
+  push:
+    tags:
+      - "v*"
+      - "[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag/versão do release (ex: v1.5.2)"
+        required: false
+        default: "nightly"
 
 env:
   RUST_VERSION: "1.75"
   LLVM_VERSION: "15.0.6"
   VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
-  VERSION: "1.4.9"
+  VERSION: "1.5.2"
+  TAG_NAME: ${{ github.event.inputs.tag || 'nightly' }}
   VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
 jobs:
@@ -97,14 +107,49 @@ jobs:
         run: |
           mkdir -p Output
           cp target/i686-pc-windows-msvc/release/rustdesk.exe Output/maxdesk.exe
+          cp target/i686-pc-windows-msvc/release/rustdesk.exe Output/maxdesk-32bit.exe
+          cp target/i686-pc-windows-msvc/release/rustdesk.exe Output/maxdesk-${{ env.VERSION }}-x86.exe
           cp sciter.dll Output/sciter.dll
+          cd Output
+          7z a maxdesk-32bit.zip maxdesk.exe sciter.dll
+          cp maxdesk-32bit.zip maxdesk-${{ env.VERSION }}-x86.zip
+          cd ..
           ls -la Output/
 
       - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: maxdesk-32bit-${{ env.VERSION }}
+          name: maxdesk-windows-32bit-${{ env.VERSION }}
           path: |
-            ./Output/maxdesk.exe
+            ./Output/maxdesk*.exe
+            ./Output/maxdesk*.zip
             ./Output/sciter.dll
+
+      - name: Publish Release (tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844
+        with:
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: "MaxDesk ${{ github.ref_name }}"
+          body: |
+            ## MaxDesk ${{ github.ref_name }} — Windows 32-bit (x86)
+
+            - `maxdesk-32bit.exe` — Executável Windows 32-bit
+            - `maxdesk-32bit.zip` — Pacote portátil com `sciter.dll`
+            
+            Servidor: maxdesk.csdigitalz.com.br
+          files: |
+            ./Output/maxdesk-32bit.exe
+            ./Output/maxdesk-32bit.zip
+
+      - name: Publish to Release (win32-latest)
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: win32-latest
+          name: MaxDesk Windows 32-bit (latest)
+          files: |
+            ./Output/maxdesk-32bit.exe
+            ./Output/maxdesk-32bit.zip

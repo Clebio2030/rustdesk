@@ -20,7 +20,8 @@
 
 | Plataforma | Formato / Tipo | Status | Link de Download / Acesso |
 |---|---|---|---|
-| **Windows (x64)** | Executável portátil / Instalador (`.exe`) | 🟢 **Disponível** | [Baixar Windows (.exe)](https://maxdesk.csdigitalz.com.br/exe) • [Link alternativo (/app)](https://maxdesk.csdigitalz.com.br/app) |
+| **Windows (x64)** | Executável portátil / Instalador (`.exe`) | 🟢 **Disponível** | [Baixar Windows x64 (.exe)](https://maxdesk.csdigitalz.com.br/exe) • [Link alternativo (/app)](https://maxdesk.csdigitalz.com.br/app) |
+| **Windows (32-bit / x86)** | Executável (`.exe`) e Portátil (`.zip`) | 🟢 **Disponível** | [Baixar Windows 32-bit (.exe)](https://maxdesk.csdigitalz.com.br/exe32) • [Pacote ZIP (/zip32)](https://maxdesk.csdigitalz.com.br/zip32) |
 | **Android** | Pacote de aplicativo (`.apk`) | 🟢 **Disponível** | [Baixar Android (.apk)](https://maxdesk.csdigitalz.com.br/apk) |
 | **Web Client** | Navegador (Flutter Web / WSS) | 🟢 **Disponível** | [Acessar Web Client](https://maxdesk.csdigitalz.com.br/web/) |
 | **Linux (x64)** | Pacote Debian / Ubuntu (`.deb`) | 🟢 **Disponível / CI Ativo** | [Baixar Linux (.deb)](https://maxdesk.csdigitalz.com.br/linux) • [Link alternativo (/deb)](https://maxdesk.csdigitalz.com.br/deb) |
@@ -34,7 +35,6 @@
 |---|---|---|---|
 | **iOS / iPadOS** | `.ipa` / TestFlight / App Store | 🔴 **Pendente** | Requer conta Apple Developer paga e ambiente de compilação Xcode/macOS |
 | **Linux ARM64** | `.deb` (Raspberry Pi / Servidores ARM) | 🟡 **Planejado** | Compilação cruzada para arquitetura `aarch64` |
-| **Windows 32-bit (x86)** | `.exe` (x86 legado) | ⚪ **Descontinuado** | Não suportado na arquitetura Flutter Desktop moderna (apenas x64) |
 
 ---
 
