@@ -20,12 +20,11 @@
 
 | Plataforma | Formato / Tipo | Status | Link de Download / Acesso |
 |---|---|---|---|
-| **Windows (x64)** | Executável portátil / Instalador (`.exe`) | 🟢 **Disponível** | [Baixar Windows x64 (.exe)](https://maxdesk.csdigitalz.com.br/exe) • [Link alternativo (/app)](https://maxdesk.csdigitalz.com.br/app) |
-| **Windows (32-bit / x86)** | Executável (`.exe`) e Portátil (`.zip`) | 🟢 **Disponível** | [Baixar Windows 32-bit (.exe)](https://maxdesk.csdigitalz.com.br/exe32) • [Pacote ZIP (/zip32)](https://maxdesk.csdigitalz.com.br/zip32) |
+| **Windows (x64 / 32-bit)** | Central de Download / Executável (`.exe`) e ZIP | 🟢 **Disponível** | [Central Windows (/windows)](https://maxdesk.csdigitalz.com.br/windows) • [x64 (.exe)](https://maxdesk.csdigitalz.com.br/exe) • [32-bit (.exe)](https://maxdesk.csdigitalz.com.br/exe32) • [32-bit (.zip)](https://maxdesk.csdigitalz.com.br/zip32) |
+| **Linux (Debian & Arch)** | Central de Download / `.deb` e `.tar.gz` portátil | 🟢 **Disponível** | [Central Linux (/linux)](https://maxdesk.csdigitalz.com.br/linux) • [Debian/Ubuntu (.deb)](https://maxdesk.csdigitalz.com.br/deb) • [Arch/Genérico (.tar.gz)](https://maxdesk.csdigitalz.com.br/download/maxdesk.tar.gz) |
 | **Android** | Pacote de aplicativo (`.apk`) | 🟢 **Disponível** | [Baixar Android (.apk)](https://maxdesk.csdigitalz.com.br/apk) |
-| **Web Client** | Navegador (Flutter Web / WSS) | 🟢 **Disponível** | [Acessar Web Client](https://maxdesk.csdigitalz.com.br/web/) |
-| **Linux (x64)** | Pacote Debian / Ubuntu (`.deb`) | 🟢 **Disponível / CI Ativo** | [Baixar Linux (.deb)](https://maxdesk.csdigitalz.com.br/linux) • [Link alternativo (/deb)](https://maxdesk.csdigitalz.com.br/deb) |
 | **macOS** | Imagem de disco (`.dmg`) Apple Silicon / Intel | 🟢 **Disponível / CI Ativo** | [Baixar macOS (.dmg)](https://maxdesk.csdigitalz.com.br/mac) • [Link alternativo (/dmg)](https://maxdesk.csdigitalz.com.br/dmg) |
+| **Web Client** | Navegador (Flutter Web / WSS) | 🟢 **Disponível** | [Acessar Web Client](https://maxdesk.csdigitalz.com.br/web/) |
 
 ---
 
