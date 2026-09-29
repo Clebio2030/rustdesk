@@ -2480,6 +2480,14 @@ class _AboutState extends State<_About> {
                   ).marginSymmetric(vertical: 4.0)),
               InkWell(
                   onTap: () {
+                    launchUrlString('https://maxdesk.csdigitalz.com.br/mac');
+                  },
+                  child: Text(
+                    'Download macOS',
+                    style: linkStyle,
+                  ).marginSymmetric(vertical: 4.0)),
+              InkWell(
+                  onTap: () {
                     launchUrlString('https://maxdesk.csdigitalz.com.br/apk');
                   },
                   child: Text(

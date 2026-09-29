@@ -24,6 +24,7 @@
 | **Android** | Pacote de aplicativo (`.apk`) | 🟢 **Disponível** | [Baixar Android (.apk)](https://maxdesk.csdigitalz.com.br/apk) |
 | **Web Client** | Navegador (Flutter Web / WSS) | 🟢 **Disponível** | [Acessar Web Client](https://maxdesk.csdigitalz.com.br/web/) |
 | **Linux (x64)** | Pacote Debian / Ubuntu (`.deb`) | 🟢 **Disponível / CI Ativo** | [Baixar Linux (.deb)](https://maxdesk.csdigitalz.com.br/linux) • [Link alternativo (/deb)](https://maxdesk.csdigitalz.com.br/deb) |
+| **macOS** | Imagem de disco (`.dmg`) Apple Silicon / Intel | 🟢 **Disponível / CI Ativo** | [Baixar macOS (.dmg)](https://maxdesk.csdigitalz.com.br/mac) • [Link alternativo (/dmg)](https://maxdesk.csdigitalz.com.br/dmg) |
 
 ---
 
@@ -31,8 +32,7 @@
 
 | Plataforma | Formato Alvo | Status | Requisitos / Pendência |
 |---|---|---|---|
-| **macOS** | `.dmg` / `.pkg` (Intel e Apple Silicon) | 🔴 **Pendente** | Requer runner macOS no GitHub Actions e assinatura/notarização Apple Developer |
-| **iOS / iPadOS** | `.ipa` / TestFlight / App Store | 🔴 **Pendente** | Requer conta Apple Developer paga e ambiente macOS/Xcode |
+| **iOS / iPadOS** | `.ipa` / TestFlight / App Store | 🔴 **Pendente** | Requer conta Apple Developer paga e ambiente de compilação Xcode/macOS |
 | **Linux ARM64** | `.deb` (Raspberry Pi / Servidores ARM) | 🟡 **Planejado** | Compilação cruzada para arquitetura `aarch64` |
 | **Windows 32-bit (x86)** | `.exe` (x86 legado) | ⚪ **Descontinuado** | Não suportado na arquitetura Flutter Desktop moderna (apenas x64) |
 

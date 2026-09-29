@@ -1001,6 +1001,12 @@ class _SettingsState extends State<SettingsPage> with WidgetsBindingObserver {
               leading: Icon(Icons.computer),
             ),
             SettingsTile(
+              title: Text("Download macOS"),
+              onPressed: (context) =>
+                  launchUrlString('https://maxdesk.csdigitalz.com.br/mac'),
+              leading: Icon(Icons.laptop_mac),
+            ),
+            SettingsTile(
               title: Text("Download Android"),
               onPressed: (context) =>
                   launchUrlString('https://maxdesk.csdigitalz.com.br/apk'),
